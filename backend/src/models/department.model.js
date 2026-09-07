@@ -13,7 +13,8 @@ const departmentSchema = new mongoose.Schema({
   },
   hod: {
     type: String,
-    required: true,
+    //ref: "employees",
+    required: true
   },
   budget: {
     type: Number,

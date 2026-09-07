@@ -4,7 +4,7 @@ async function getAllEmployees(req, res) {
   try {
     const employees = await employeeModel
       .find()
-      .populate("department", "name -_id")
+      .populate("department", "name")
       .populate("manager");
     res.status(200).json(employees);
   } catch (error) {
@@ -28,6 +28,7 @@ async function createEmployee(req, res) {
       education,
       jpplExperience,
       totalExperience,
+      managerFlag
     } = req.body;
 
     const lastEmployee = await employeeModel.findOne().sort({ employeeId: -1 });
@@ -57,6 +58,7 @@ async function createEmployee(req, res) {
       education,
       jpplExperience,
       totalExperience,
+      managerFlag
     });
 
     res.status(201).json(employee);
@@ -82,6 +84,7 @@ async function updateEmployee(req, res) {
       rating,
       jpplExperience,
       totalExperience,
+      managerFlag
     } = req.body;
 
     const employee = await employeeModel.findByIdAndUpdate(
@@ -96,6 +99,7 @@ async function updateEmployee(req, res) {
         rating,
         jpplExperience,
         totalExperience,
+        managerFlag
       },
       {
         returnDocument: "after",
@@ -111,6 +115,7 @@ async function updateEmployee(req, res) {
 
     res.status(200).json(employee);
   } catch (error) {
+    console.error("Update Employee Error: ", error);
     res.status(500).json({
       message: "Failed to update employee",
       error: error.message,

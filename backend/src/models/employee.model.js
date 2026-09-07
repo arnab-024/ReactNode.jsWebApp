@@ -54,6 +54,11 @@ const employeeSchema = new mongoose.Schema({
         type: Number,
         min: 0,
         default: 0
+    },
+    managerFlag: {
+        type: String,
+        enum: ["N", "Y"],
+        default: "N"
     }
 });
 

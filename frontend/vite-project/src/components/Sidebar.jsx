@@ -13,6 +13,7 @@ import {
   Bell,
   FileText,
 } from "lucide-react";
+import { NavLink } from "react-router-dom";
 
 const menuItems = [
   {
@@ -97,13 +98,19 @@ function Sidebar() {
           const Icon = item.icon;
 
           return (
-            <button
-              key={item.path}
-              title={item.label}
-              className="flex h-9 w-9 items-center justify-center rounded-lg text-white/80 transition hover:bg-blue-900 hover:text-white"
+            <NavLink
+              key={item.name}
+              to={item.path}
+              className={({ isActive }) =>
+                `flex items-center justify-center w-full h-10 rounded-lg ${
+                  isActive
+                    ? "bg-blue-800 text-white"
+                    : "text-white/70 hover:bg-blue-700 hover:text-white"
+                }`
+              }
             >
-              <Icon size={18} strokeWidth={1.8} />
-            </button>
+              <Icon size={18} />
+            </NavLink>
           );
         })}
       </nav>

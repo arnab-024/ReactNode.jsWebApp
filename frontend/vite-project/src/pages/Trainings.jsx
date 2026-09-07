@@ -20,6 +20,12 @@ function Trainings() {
   const [editingTraining, setEditingTraining] = useState(null);
 
   const [formData, setFormData] = useState(initialForm);
+  const [showManageModal, setShowManageModal] = useState(false);
+  const [selectedTraining, setSelectedTraining] = useState(null);
+
+  const [employees, setEmployees] = useState([]);
+  const [mappings, setMappings] = useState([]);
+  const [selectedEmployee, setSelectedEmployee] = useState("");
 
   // Fetch trainings
   const fetchTrainings = async () => {
@@ -108,6 +114,83 @@ function Trainings() {
     }
   };
 
+  const fetchEmployees = async () => {
+    try {
+      const response = await axios.get("http://localhost:3000/api/employees");
+
+      setEmployees(response.data);
+    } catch (error) {
+      console.error("Error fetching employees:", error);
+    }
+  };
+
+  const fetchMappings = async (trainingId) => {
+    try {
+      const response = await axios.get(
+        "http://localhost:3000/api/training-mappings",
+      );
+
+      const trainingMappings = response.data.filter(
+        (mapping) => mapping.training?._id === trainingId,
+      );
+
+      setMappings(trainingMappings);
+    } catch (error) {
+      console.error("Error fetching mappings:", error);
+    }
+  };
+
+  const handleManage = async (training) => {
+    setSelectedTraining(training);
+    setSelectedEmployee("");
+
+    await fetchEmployees();
+    await fetchMappings(training._id);
+
+    setShowManageModal(true);
+  };
+
+  const handleAssign = async () => {
+    if (!selectedEmployee) return;
+
+    try {
+      await axios.post(
+        "http://localhost:3000/api/training-mappings/createMapping",
+        {
+          employee: selectedEmployee,
+          training: selectedTraining._id,
+        },
+      );
+
+      setSelectedEmployee("");
+
+      await fetchMappings(selectedTraining._id);
+
+      // Refresh course cards too
+      fetchTrainings();
+    } catch (error) {
+      console.error("Error assigning training:", error);
+      alert(error.response?.data?.message || "Unable to assign training.");
+    }
+  };
+
+  const handleDeleteMapping = async (mappingId) => {
+    const confirmed = window.confirm("Remove this employee from the training?");
+
+    if (!confirmed) return;
+
+    try {
+      await axios.delete(
+        `http://localhost:3000/api/training-mappings/deleteMapping/${mappingId}`,
+      );
+
+      await fetchMappings(selectedTraining._id);
+      fetchTrainings();
+    } catch (error) {
+      console.error("Error deleting mapping:", error);
+    }
+  };
+
   // Search
   const filteredTrainings = trainings.filter((training) =>
     `${training.title} ${training.category} ${training.trainingId}`
@@ -116,7 +199,7 @@ function Trainings() {
   );
 
   return (
-    <div className="min-h-screen bg-slate-50 p-6">
+    <div className="min-h-screen bg-slate-50 p-6 ml-[52px]">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
@@ -140,7 +223,7 @@ function Trainings() {
       </div>
 
       {/* Search */}
-      <div className="relative w-[280px] mb-6">
+      <div className="relative w-[320px] ml-2 mb-6">
         <Search
           size={16}
           className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
@@ -215,9 +298,7 @@ function Trainings() {
             {/* Actions */}
             <div className="flex items-center gap-3 mt-4">
               <button
-                onClick={() => {
-                  // Mapping / Manage functionality will be added next
-                }}
+                onClick={() => handleManage(training)}
                 className="border border-slate-200 bg-slate-50 hover:bg-slate-100 px-3 py-1.5 rounded-md text-xs font-medium"
               >
                 Manage
@@ -381,6 +462,124 @@ function Trainings() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+      {showManageModal && selectedTraining && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+          <div className="bg-white w-[500px] rounded-xl shadow-xl p-5">
+            {/* Header */}
+            <div className="flex justify-between items-start mb-4">
+              <div>
+                <h2 className="text-lg font-semibold text-slate-800">
+                  {selectedTraining.title}
+                </h2>
+
+                <p className="text-xs text-slate-500 mt-1">
+                  Assign employees, track progress and proficiency.
+                </p>
+              </div>
+
+              <button
+                onClick={() => setShowManageModal(false)}
+                className="text-slate-400 hover:text-slate-700"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {/* Assign */}
+            <div className="flex gap-2 mb-5">
+              <select
+                value={selectedEmployee}
+                onChange={(e) => setSelectedEmployee(e.target.value)}
+                className="flex-1 border border-slate-300 rounded-md px-3 py-2 text-sm bg-white"
+              >
+                <option value="">Select employee...</option>
+
+                {employees
+                  .filter(
+                    (employee) =>
+                      !mappings.some(
+                        (mapping) => mapping.employee?._id === employee._id,
+                      ),
+                  )
+                  .map((employee) => (
+                    <option key={employee._id} value={employee._id}>
+                      {employee.name}
+                    </option>
+                  ))}
+              </select>
+
+              <button
+                onClick={handleAssign}
+                disabled={!selectedEmployee}
+                className="bg-blue-700 hover:bg-blue-800 disabled:bg-slate-300 text-white px-4 rounded-md text-sm font-medium"
+              >
+                Assign
+              </button>
+            </div>
+
+            {/* Assigned Employees */}
+            <div>
+              <div className="grid grid-cols-3 text-xs font-medium text-slate-500 border-b pb-2">
+                <span>Employee</span>
+                <span>Progress</span>
+                <span>Proficiency</span>
+              </div>
+
+              {mappings.length === 0 ? (
+                <div className="py-8 text-center text-sm text-slate-400">
+                  No employees assigned.
+                </div>
+              ) : (
+                mappings.map((mapping) => (
+                  <div
+                    key={mapping._id}
+                    className="grid grid-cols-3 items-center py-3 border-b text-sm"
+                  >
+                    {/* Employee */}
+                    <span className="font-medium text-slate-700">
+                      {mapping.employee?.name}
+                    </span>
+
+                    {/* Progress */}
+                    <div className="pr-4">
+                      <div className="flex justify-between text-[10px] text-slate-500 mb-1">
+                        <span>{mapping.progress}%</span>
+                      </div>
+
+                      <div className="h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-blue-700"
+                          style={{
+                            width: `${mapping.progress}%`,
+                          }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Proficiency */}
+                    <div className="flex items-center justify-between">
+                      <span className="text-yellow-500 text-xs">
+                        {"★".repeat(mapping.proficiency)}
+                        <span className="text-slate-300">
+                          {"★".repeat(5 - mapping.proficiency)}
+                        </span>
+                      </span>
+
+                      <button
+                        onClick={() => handleDeleteMapping(mapping._id)}
+                        className="text-red-500 hover:text-red-700 ml-2"
+                        title="Remove"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
           </div>
         </div>
       )}
