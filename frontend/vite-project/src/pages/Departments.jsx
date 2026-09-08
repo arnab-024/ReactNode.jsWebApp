@@ -15,15 +15,29 @@ function Departments() {
   });
 
   const [openMenu, setOpenMenu] = useState(null);
+  const [menuPosition, setMenuPosition] = useState({
+    top: 0,
+    left: 0,
+  });
 
   useEffect(() => {
     fetchDepartments();
+    const handleClickOutside = () => {
+      setOpenMenu(null);
+    };
+
+    document.addEventListener("click", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+    };
   }, []);
 
   // GET departments
   const fetchDepartments = async () => {
     try {
       const response = await axios.get("http://localhost:3000/api/departments");
+      console.error(response.error);
 
       setDepartments(response.data);
     } catch (error) {
@@ -110,13 +124,13 @@ function Departments() {
   };
 
   return (
-    <div className="px-20 py-10">
+    <div className="min-h-screen bg-gray-50 px-10 py-8">
       {/* Header */}
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-end mb-8">
         <div>
-          <h1 className="text-2xl font-semibold">Departments</h1>
+          <h1 className="text-3xl font-semibold text-gray-900">Departments</h1>
 
-          <p className="mt-1 text-sm text-gray-500">
+          <p className="mt-2 text-sm text-gray-500">
             Manage departments and their information
           </p>
         </div>
@@ -134,55 +148,76 @@ function Departments() {
 
             setShowDepartmentModal(true);
           }}
-          className="bg-orange-600 text-white px-4 py-2 rounded-lg"
+          className="bg-orange-600 text-white px-5 py-2.5 rounded-lg font-medium shadow-sm hover:bg-orange-700 transition-colors"
         >
           + Add Department
         </button>
       </div>
 
       {/* Department table */}
-      <div className="mt-8 overflow-x-auto rounded-xl border bg-white">
-        <table className="w-full text-left text-sm">
-          <thead className="border-b bg-gray-50">
+      <div className="mt-8 overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-sm">
+        <table className="w-full text-left text-sm text-gray-700">
+          <thead className="border-b border-gray-200 bg-gray-50 text-gray-600">
             <tr>
-              <th className="px-4 py-3">Department ID</th>
-              <th className="px-4 py-3">Name</th>
-              <th className="px-4 py-3">HOD</th>
-              <th className="px-4 py-3">Employees</th>
-              <th className="px-4 py-3">Budget</th>
-              <th className="px-4 py-3"></th>
+              <th className="px-4 py-3 text-xs font-medium uppercase tracking-wide text-gray-500">Department ID</th>
+              <th className="px-4 py-3 text-xs font-medium uppercase tracking-wide text-gray-500">Name</th>
+              <th className="px-4 py-3 text-xs font-medium uppercase tracking-wide text-gray-500">HOD</th>
+              <th className="px-4 py-3 text-xs font-medium uppercase tracking-wide text-gray-500">Employees</th>
+              <th className="px-4 py-3 text-xs font-medium uppercase tracking-wide text-gray-500">Budget</th>
+              <th className="px-4 py-3 text-xs font-medium uppercase tracking-wide text-gray-500"></th>
             </tr>
           </thead>
 
           <tbody>
             {departments.map((department) => (
-              <tr key={department._id} className="border-b">
-                <td className="px-4 py-3">{department.departmentId}</td>
+              <tr
+                key={department._id}
+                className="border-b last:border-b-0 hover:bg-gray-50 transition-colors"
+              >
+                <td className="px-4 py-3 text-xs font-medium uppercase tracking-wide text-gray-500">
+                  {department.departmentId}
+                </td>
 
-                <td className="px-4 py-3">{department.name}</td>
+                <td className="px-4 py-3 text-xs font-medium uppercase tracking-wide text-gray-500">{department.name}</td>
 
-                <td className="px-4 py-3">{department.hod}</td>
+                <td className="px-4 py-3 text-xs font-medium uppercase tracking-wide text-gray-500">{department.hod}</td>
 
-                <td className="px-4 py-3">{department.employeeCount ?? 0}</td>
+                <td className="px-4 py-3 text-xs font-medium uppercase tracking-wide text-gray-500">
+                  {department.employeeCount ?? 0}
+                </td>
 
-                <td className="px-4 py-3">
+                <td className="px-4 py-3 text-xs font-medium uppercase tracking-wide text-gray-500">
                   ₹{Number(department.budget).toFixed(1)} L
                 </td>
 
-                <td className="px-4 py-3 relative">
+                <td className="px-4 py-3 font-medium relative">
                   <button
-                    onClick={() =>
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      const rect = e.currentTarget.getBoundingClientRect();
+
+                      setMenuPosition({
+                        top: rect.bottom,
+                        left: rect.right,
+                      });
+
                       setOpenMenu(
                         openMenu === department._id ? null : department._id,
-                      )
-                    }
+                      );
+                    }}
                     className="text-gray-500 hover:text-gray-700 text-xl"
                   >
                     ⋮
                   </button>
 
                   {openMenu === department._id && (
-                    <div className="absolute right-0 mt-2 w-32 bg-white border rounded-lg shadow-lg z-50">
+                    <div
+                      className="fixed w-32 bg-white border border-gray-200 rounded-lg shadow-md z-50 overflow-hidden"
+                      style={{
+                        top: menuPosition.top,
+                        left: menuPosition.left - 128,
+                      }}
+                    >
                       <button
                         onClick={() => handleEdit(department)}
                         className="w-full text-left px-4 py-2 hover:bg-gray-100"
