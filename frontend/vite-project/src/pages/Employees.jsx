@@ -28,7 +28,24 @@ function Employees() {
     left: 0,
   });
   const [departments, setDepartments] = useState([]);
+  const fetchDepartments = async () => {
+    try {
+      const response = await axios.get("http://localhost:3000/api/departments");
 
+      setDepartments(response.data);
+    } catch (error) {
+      console.error("Error fetching departments:", error);
+    }
+  };
+  const fetchEmployees = async () => {
+    try {
+      const response = await axios.get("http://localhost:3000/api/employees");
+
+      setEmployees(response.data);
+    } catch (error) {
+      console.error("Error fetching employees:", error.response?.data);
+    }
+  };
   useEffect(() => {
     fetchEmployees();
     fetchDepartments();
@@ -45,16 +62,6 @@ function Employees() {
       document.removeEventListener("click", handleClick);
     };
   }, []);
-
-  const fetchDepartments = async () => {
-    try {
-      const response = await axios.get("http://localhost:3000/api/departments");
-
-      setDepartments(response.data);
-    } catch (error) {
-      console.error("Error fetching departments:", error);
-    }
-  };
 
   const filteredEmployees = employees.filter((employee) => {
     const matchesSearch =
@@ -74,16 +81,6 @@ function Employees() {
       matchesSearch && matchesDepartment && matchesDesignation && matchesStatus
     );
   });
-
-  const fetchEmployees = async () => {
-    try {
-      const response = await axios.get("http://localhost:3000/api/employees");
-
-      setEmployees(response.data);
-    } catch (error) {
-      console.error("Error fetching employees:", error.response?.data);
-    }
-  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
