@@ -2,11 +2,12 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import Sidebar from "./components/Sidebar";
 
-import Dashboard from "./pages/Dashboard";
+//import Dashboard from "./pages/Dashboard";
 import Employees from "./pages/Employees";
 import Departments from "./pages/Departments";
 import Trainings from "./pages/Trainings";
 import TNI from "./pages/TNI";
+import AdminDashboard from "./pages/AdminDashboard";
 
 function App() {
   return (
@@ -16,7 +17,7 @@ function App() {
 
         <main className="flex-1 ml-[52px]">
           <Routes>
-             {/*<Route path="/" element={<Dashboard />} />*/}
+            <Route path="/" element={<AdminDashboard />} />
 
             <Route path="/employees" element={<Employees />} />
 
