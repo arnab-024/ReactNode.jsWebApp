@@ -19,6 +19,49 @@ import {
 
 const AdminDashboard = () => {
   const [totalEmployees, setTotalEmployees] = useState(0);
+  const [departments, setDepartments] = useState([]);
+  const pendingApprovalsData = [
+    {
+      review: "RV-2401",
+      employee: "Anita Verma",
+      departmentIndex: 0,
+      status: "Under Review",
+      progress: 80,
+      due: "2026-05-22",
+    },
+    {
+      review: "RV-2402",
+      employee: "Manoj Pillai",
+      departmentIndex: 1,
+      status: "Approved",
+      progress: 100,
+      due: "2026-05-18",
+    },
+    {
+      review: "RV-2403",
+      employee: "Devika Rao",
+      departmentIndex: 2,
+      status: "Draft",
+      progress: 35,
+      due: "2026-05-30",
+    },
+    {
+      review: "RV-2404",
+      employee: "Arjun Mehta",
+      departmentIndex: 3,
+      status: "Rework Requested",
+      progress: 60,
+      due: "2026-05-25",
+    },
+    {
+      review: "RV-2405",
+      employee: "Sneha Kulkarni",
+      departmentIndex: 4,
+      status: "Submitted",
+      progress: 100,
+      due: "2026-05-20",
+    },
+  ];
 
   useEffect(() => {
     const fetchEmployees = async () => {
@@ -29,6 +72,19 @@ const AdminDashboard = () => {
         console.error("Error Fetching Employees: ", error);
       }
     };
+
+    const fetchDepartments = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:3000/api/departments",
+        );
+
+        setDepartments(response.data);
+      } catch (error) {
+        console.error("Error fetching departments:", error);
+      }
+    };
+    fetchDepartments();
     fetchEmployees();
   }, []);
 
@@ -117,6 +173,28 @@ const AdminDashboard = () => {
       action: "Performance review completed",
       time: "Yesterday",
     },
+  ];
+  const departmentChartData = [
+    { department: "Polymer R&D", headcount: 48, ctc: 10.5 },
+    { department: "Production", headcount: 92, ctc: 8.2 },
+    { department: "Quality Control", headcount: 36, ctc: 9.1 },
+    { department: "Supply Chain", headcount: 42, ctc: 8.8 },
+    { department: "Maintenance", headcount: 29, ctc: 7.6 },
+    { department: "HR & Admin", headcount: 17, ctc: 6.9 },
+  ];
+  const packageBandData = [
+    { band: "0-5L", employees: 32 },
+    { band: "5-10L", employees: 86 },
+    { band: "10-15L", employees: 74 },
+    { band: "15-20L", employees: 48 },
+    { band: "20L+", employees: 24 },
+  ];
+  const salaryCostData = [
+    { department: "Production", salaryCost: 8.2 },
+    { department: "Polymer R&D", salaryCost: 6.5 },
+    { department: "Supply Chain", salaryCost: 4.8 },
+    { department: "Quality Control", salaryCost: 4.1 },
+    { department: "Maintenance", salaryCost: 2.9 },
   ];
   return (
     <div className="px-20 py-10">
@@ -280,6 +358,250 @@ const AdminDashboard = () => {
             />
           </LineChart>
         </ResponsiveContainer>
+      </div>
+      <div className="bg-white border border-gray-200 rounded-xl p-5 mt-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-lg font-semibold text-gray-900">
+              Pending Approvals
+            </h2>
+
+            <p className="text-sm text-gray-500 mt-1">
+              Reviews awaiting action
+            </p>
+          </div>
+
+          <button className="text-sm font-medium text-blue-600 hover:text-blue-700">
+            View all →
+          </button>
+        </div>
+        <div className="mt-6 overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-gray-200 text-left text-gray-600">
+                <th className="py-3 font-medium">Review</th>
+                <th className="py-3 font-medium">Employee</th>
+                <th className="py-3 font-medium">Department</th>
+                <th className="py-3 font-medium">Status</th>
+                <th className="py-3 font-medium">Progress</th>
+                <th className="py-3 font-medium">Due</th>
+              </tr>
+            </thead>
+            <tbody>
+              {pendingApprovalsData.map((approval, index) => (
+                <tr
+                  key={index}
+                  className="border-b border-gray-100 last:border-b-0 hover:bg-gray-50 transition-colors"
+                >
+                  <td className="py-4 font-medium text-gray-900">
+                    {approval.review}
+                  </td>
+
+                  <td className="py-4 text-gray-700">{approval.employee}</td>
+
+                  <td className="py-4 text-gray-700">
+                    {departments[approval.departmentIndex]?.name || "—"}
+                  </td>
+
+                  <td className="py-4">{approval.status}</td>
+
+                  <td className="py-4">{approval.progress}%</td>
+
+                  <td className="py-4 text-gray-600">{approval.due}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div className="bg-white border border-gray-200 mt-6 p-5 rounded-xl">
+        <div>
+          <h1 className="text-2xl font-semibold text-gray-900">
+            Department Overview
+          </h1>
+          <p className="text-sm text-gray-500">
+            Headcount, salary & package distribution across departments
+          </p>
+        </div>
+        <div className="grid grid-cols-4 gap-4 mt-6">
+          {/* Total Department Count */}
+          <div className="bg-white border border-gray-200 rounded-xl p-5">
+            <p className="text-sm text-gray-500">Total Departments</p>
+            <h2 className="text-2xl font-semibold mt-2">
+              {departments.length}
+            </h2>
+            <p className="text-xs text-green-600 mt-1">+ 1 this month</p>
+          </div>
+
+          {/* Total Headcount */}
+          <div className="bg-white border border-gray-200 rounded-xl p-5">
+            <p className="text-sm text-gray-500">Total Headcount</p>
+            <h2 className="text-2xl font-semibold mt-2">264</h2>
+            <p className="text-xs text-green-600 mt-1">↗ 8% vs last cycle</p>
+          </div>
+
+          {/* Monthly payout */}
+          <div className="bg-white border border-gray-200 rounded-xl p-5">
+            <p className="text-sm text-gray-500">Pending Approvals</p>
+            <h2 className="text-2xl font-semibold mt-2">Rs 2.06 Cr</h2>
+            <p className="text-xs text-gray-500 mt-1">↗ 8%</p>
+          </div>
+
+          {/* Average CTC */}
+          <div className="bg-white border border-gray-200 rounded-xl p-5">
+            <p className="text-sm text-gray-500">Average CTC</p>
+            <h2 className="text-2xl font-semibold mt-2">Rs 9.3L</h2>
+            <p className="text-xs text-green-600 mt-1">↗ 10 increase</p>
+          </div>
+
+          {/*Highest CTC Department*/}
+          <div className="bg-white border border-gray-200 rounded-xl p-5">
+            <p className="text-sm text-gray-500">Highest CTC Department</p>
+            <h2 className="text-2xl font-semibold mt-2">Polymer R&D</h2>
+          </div>
+
+          {/*Largest Department */}
+          <div className="bg-white border border-gray-200 rounded-xl p-5">
+            <p className="text-sm text-gray-500">Largest Department</p>
+            <h2 className="text-2xl font-semibold mt-2">Production</h2>
+          </div>
+
+          {/*Department Performance */}
+          <div className="bg-white border border-gray-200 rounded-xl p-5">
+            <p className="text-sm text-gray-500">
+              Overall Department Performance
+            </p>
+            <h2 className="text-2xl font-semibold mt-2">4.0/5</h2>
+            <p className="text-xs text-gray-500 mt-1">↗ 8%</p>
+          </div>
+
+          {/*Annual Sales */}
+          <div className="bg-white border border-gray-200 rounded-xl p-5">
+            <p className="text-sm text-gray-500">Annual Sales</p>
+            <h2 className="text-2xl font-semibold mt-2">Rs 17.5 Cr</h2>
+            <p className="text-xs text-gray-500 mt-1">↗ 10% increase</p>
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-4 mt-6">
+          <div className="bg-white border border-gray-200 rounded-xl p-5">
+            <h2 className="text-lg font-semibold text-gray-900 mb-5">
+              Headcount & Avg CTC by Department
+            </h2>
+
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={departmentChartData}>
+                <CartesianGrid strokeDasharray="3 3" />
+
+                <XAxis dataKey="department" />
+
+                <YAxis yAxisId="left" />
+
+                <YAxis
+                  yAxisId="right"
+                  orientation="right"
+                  tickFormatter={(value) => `${value}L`}
+                />
+
+                <Tooltip />
+
+                <Legend />
+
+                <Bar
+                  dataKey="headcount"
+                  name="Headcount"
+                  fill="#2563eb"
+                  yAxisId="left"
+                />
+                <Line
+                  type="monotone"
+                  dataKey="ctc"
+                  name="Avg CTC (₹L)"
+                  stroke="#f59e0b"
+                  strokeWidth={2}
+                  yAxisId="right"
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+          <div className="bg-white border border-gray-200 rounded-xl p-5">
+            <h2 className="text-lg font-semibold text-gray-900 mb-5">
+              Salary Distribution by Department
+            </h2>
+
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie
+                  data={departmentChartData}
+                  dataKey="ctc"
+                  nameKey="department"
+                  cx="50%"
+                  cy="45%"
+                  outerRadius={90}
+                >
+                  {departmentChartData.map((entry, index) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={
+                        [
+                          "#2563eb",
+                          "#f97316",
+                          "#10b981",
+                          "#8b5cf6",
+                          "#ec4899",
+                          "#f59e0b",
+                        ][index]
+                      }
+                    />
+                  ))}
+                </Pie>
+                <Tooltip />
+                <Legend />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+          <div className="bg-white border border-gray-200 rounded-xl p-5">
+            <h2 className="text-lg font-semibold text-gray-900 mb-5">
+              Package Band Distribution
+            </h2>
+
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={packageBandData}>
+                <CartesianGrid strokeDasharray="3 3" />
+
+                <XAxis dataKey="band" />
+
+                <YAxis />
+
+                <Tooltip />
+
+                <Legend />
+
+                <Bar dataKey="employees" name="Employees" fill="#2563eb" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+          <div className="bg-white border border-gray-200 rounded-xl p-5">
+            <h2 className="text-lg font-semibold text-gray-900 mb-5">
+              Top 5 Departments by Salary Cost
+            </h2>
+
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={salaryCostData} layout="vertical">
+                <CartesianGrid strokeDasharray="3 3" />
+
+                <XAxis type="number" tickFormatter={(value) => `₹${value}Cr`} />
+
+                <YAxis type="category" dataKey="department" width={100} />
+
+                <Tooltip
+                  formatter={(value) => [`₹${value} Cr`, "Salary Cost"]}
+                />
+
+                <Bar dataKey="salaryCost" name="Salary Cost" fill="#2563eb" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
       </div>
     </div>
   );
