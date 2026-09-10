@@ -91,6 +91,33 @@ const AdminDashboard = () => {
     { month: "Aug", rating: 3.8, target: 4.0 },
     { month: "Sep", rating: 4.0, target: 4.0 },
   ];
+  const recentActivityData = [
+    {
+      employee: "Rahul Sharma",
+      action: "Performance review completed",
+      time: "10 minutes ago",
+    },
+    {
+      employee: "Priya Patel",
+      action: "Training completed",
+      time: "1 hour ago",
+    },
+    {
+      employee: "Amit Verma",
+      action: "Performance review submitted",
+      time: "2 hours ago",
+    },
+    {
+      employee: "Sneha Joshi",
+      action: "Training assigned",
+      time: "4 hours ago",
+    },
+    {
+      employee: "Rohan Mehta",
+      action: "Performance review completed",
+      time: "Yesterday",
+    },
+  ];
   return (
     <div className="px-20 py-10">
       <div>
@@ -128,6 +155,30 @@ const AdminDashboard = () => {
           <p className="text-sm text-gray-500">Completed Reviews</p>
           <h2 className="text-2xl font-semibold mt-2">311</h2>
           <p className="text-xs text-green-600 mt-1">↗ 92% on time</p>
+        </div>
+      </div>
+      <div className="bg-white border border-gray-200 rounded-xl p-5 mt-6">
+        <h2 className="text-lg font-semibold text-gray-900">Recent Activity</h2>
+
+        <p className="text-sm text-gray-500 mt-1">
+          Latest employee and review activities
+        </p>
+        <div className="mt-5">
+          {recentActivityData.map((activity, index) => (
+            <div
+              key={index}
+              className="flex items-center justify-between py-4 border-b border-gray-100 last:border-b-0"
+            >
+              <div>
+                <p className="text-sm font-medium text-gray-900">
+                  {activity.employee}
+                </p>
+                <p className="text-sm text-gray-500 mt-1">{activity.action}</p>
+              </div>
+
+              <p className="text-xs text-gray-400">{activity.time}</p>
+            </div>
+          ))}
         </div>
       </div>
       <div className="bg-white border border-gray-200 rounded-xl p-5 mt-6">
@@ -215,9 +266,18 @@ const AdminDashboard = () => {
             <Tooltip />
             <Legend />
 
-            <Line type="monotone" dataKey="rating" name="Average Rating" fill="orange" />
-
-            <Line type="monotone" dataKey="target" name="Target Rating" fill="green"/>
+            <Line
+              type="monotone"
+              dataKey="rating"
+              name="Average Rating"
+              stroke="green"
+            />
+            <Line
+              type="monotone"
+              dataKey="target"
+              name="Target Rating"
+              stroke="#2563eb"
+            />
           </LineChart>
         </ResponsiveContainer>
       </div>
