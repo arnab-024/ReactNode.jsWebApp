@@ -3,7 +3,7 @@ import React from "react";
 import axios from "axios";
 import { Plus, Pencil, Trash2, Search, Users, X } from "lucide-react";
 
-const API = "http://localhost:3000/api/trainings";
+const API = "https://localhost:3000/api/trainings";
 
 const initialForm = {
   title: "",
@@ -117,7 +117,7 @@ function Trainings() {
 
   const fetchEmployees = async () => {
     try {
-      const response = await axios.get("http://localhost:3000/api/employees");
+      const response = await axios.get("https://localhost:3000/api/employees");
 
       setEmployees(response.data);
     } catch (error) {
@@ -128,7 +128,7 @@ function Trainings() {
   const fetchMappings = async (trainingId) => {
     try {
       const response = await axios.get(
-        "http://localhost:3000/api/training-mappings",
+        "https://localhost:3000/api/training-mappings",
       );
 
       const trainingMappings = response.data.filter(
@@ -156,7 +156,7 @@ function Trainings() {
 
     try {
       await axios.post(
-        "http://localhost:3000/api/training-mappings/createMapping",
+        "https://localhost:3000/api/training-mappings/createMapping",
         {
           employee: selectedEmployee,
           training: selectedTraining._id,
@@ -182,7 +182,7 @@ function Trainings() {
 
     try {
       await axios.delete(
-        `http://localhost:3000/api/training-mappings/deleteMapping/${mappingId}`,
+        `https://localhost:3000/api/training-mappings/deleteMapping/${mappingId}`,
       );
 
       await fetchMappings(selectedTraining._id);

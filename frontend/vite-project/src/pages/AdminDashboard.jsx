@@ -66,7 +66,7 @@ const AdminDashboard = () => {
   useEffect(() => {
     const fetchEmployees = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/api/employees");
+        const response = await axios.get("https://localhost:3000/api/employees");
         setTotalEmployees(response.data.length);
       } catch (error) {
         console.error("Error Fetching Employees: ", error);
@@ -76,7 +76,7 @@ const AdminDashboard = () => {
     const fetchDepartments = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:3000/api/departments",
+          "https://localhost:3000/api/departments",
         );
 
         setDepartments(response.data);

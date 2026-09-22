@@ -30,7 +30,7 @@ function Employees() {
   const [departments, setDepartments] = useState([]);
   const fetchDepartments = async () => {
     try {
-      const response = await axios.get("http://localhost:3000/api/departments");
+      const response = await axios.get("https://localhost:3000/api/departments");
 
       setDepartments(response.data);
     } catch (error) {
@@ -39,7 +39,7 @@ function Employees() {
   };
   const fetchEmployees = async () => {
     try {
-      const response = await axios.get("http://localhost:3000/api/employees");
+      const response = await axios.get("https://localhost:3000/api/employees");
 
       setEmployees(response.data);
     } catch (error) {
@@ -100,7 +100,7 @@ function Employees() {
 
     try {
       await axios.delete(
-        `http://localhost:3000/api/employees/deleteEmployee/${id}`,
+        `https://localhost:3000/api/employees/deleteEmployee/${id}`,
       );
 
       setOpenMenu(null);
@@ -115,12 +115,12 @@ function Employees() {
     try {
       if (editingEmployee) {
         await axios.put(
-          `http://localhost:3000/api/employees/updateEmployee/${editingEmployee._id}`,
+          `https://localhost:3000/api/employees/updateEmployee/${editingEmployee._id}`,
           formData,
         );
       } else {
         await axios.post(
-          "http://localhost:3000/api/employees/createEmployee",
+          "https://localhost:3000/api/employees/createEmployee",
           formData,
         );
       }

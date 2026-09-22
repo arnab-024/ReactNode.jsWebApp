@@ -18,7 +18,7 @@ import { NavLink } from "react-router-dom";
 const menuItems = [
   {
     icon: LayoutGrid,
-    label: "Dashboard",
+    label: "AdminDashboard",
     path: "/",
   },
   {
@@ -99,7 +99,7 @@ function Sidebar() {
 
           return (
             <NavLink
-              key={item.name}
+              key={item.path}
               to={item.path}
               className={({ isActive }) =>
                 `flex items-center justify-center w-full h-10 rounded-lg ${

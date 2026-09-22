@@ -20,6 +20,18 @@ function Departments() {
     left: 0,
   });
 
+  // GET departments
+  const fetchDepartments = async () => {
+    try {
+      const response = await axios.get("https://localhost:3000/api/departments");
+      console.error(response.error);
+
+      setDepartments(response.data);
+    } catch (error) {
+      console.error("Error fetching departments:", error);
+    }
+  };
+
   useEffect(() => {
     fetchDepartments();
     const handleClickOutside = () => {
@@ -32,18 +44,6 @@ function Departments() {
       document.removeEventListener("click", handleClickOutside);
     };
   }, []);
-
-  // GET departments
-  const fetchDepartments = async () => {
-    try {
-      const response = await axios.get("http://localhost:3000/api/departments");
-      console.error(response.error);
-
-      setDepartments(response.data);
-    } catch (error) {
-      console.error("Error fetching departments:", error);
-    }
-  };
 
   // Handle form input
   const handleChange = (e) => {
@@ -62,12 +62,12 @@ function Departments() {
     try {
       if (editingDepartment) {
         await axios.put(
-          `http://localhost:3000/api/departments/updateDepartment/${editingDepartment._id}`,
+          `https://localhost:3000/api/departments/updateDepartment/${editingDepartment._id}`,
           formData,
         );
       } else {
         await axios.post(
-          "http://localhost:3000/api/departments/createDepartment",
+          "https://localhost:3000/api/departments/createDepartment",
           formData,
         );
       }
@@ -98,7 +98,7 @@ function Departments() {
 
     try {
       await axios.delete(
-        `http://localhost:3000/api/departments/deleteDepartment/${id}`,
+        `https://localhost:3000/api/departments/deleteDepartment/${id}`,
       );
 
       setOpenMenu(null);
