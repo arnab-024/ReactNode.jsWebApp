@@ -5,6 +5,7 @@
 .env
 **/.env
 backend/certificates/
+frontend/vite-project/certs/
 
 # Build output
 **/dist/
