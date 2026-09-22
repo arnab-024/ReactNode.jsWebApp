@@ -4,6 +4,7 @@
 # Environment variables / secrets
 .env
 **/.env
+backend/certificates/
 
 # Build output
 **/dist/
